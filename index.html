@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glücksrad – Drehe & Gewinne!</title>
+  <style>
+    :root {
+      --brand: #0ea5e9; /* Primärfarbe */
+      --ink: #111827;  /* Text dunkel */
+      --muted: #6b7280; /* Text grau */
+      --bg1: #ffffff;
+      --bg2: #f1f5f9; /* Slate-100 */
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ink);
+      background: linear-gradient(#fff, var(--bg2));
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .center { text-align: center; }
+    .title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -0.02em; margin: 8px 0; }
+    .subtitle { color: var(--muted); margin: 0 auto 8px; max-width: 680px; }
+    .badge { color: var(--muted); font-size: 12px; }
+    .logo { height: 48px; object-fit: contain; }
+
+    .wheel-wrap { position: relative; width: 320px; height: 320px; margin: 18px auto; }
+    .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+    .pointer .tri { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 22px solid var(--brand); }
+
+    .wheel { width: 320px; height: 320px; border-radius: 50%; box-shadow: 0 8px 30px rgba(2,6,23,.12); overflow: hidden; transform: rotate(0deg); }
+    .wheel.spin { transition: transform 6s cubic-bezier(0.1, 0.85, 0.12, 1); }
+
+    .btn { display: inline-block; padding: 12px 20px; border-radius: 16px; border: 1px solid #e5e7eb; background: #111827; color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(2,6,23,.15); }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; }
+    .btn.secondary { background: #fff; color: var(--ink); }
+
+    .helper { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .panel { border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; background: #fff; }
+
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+    .modal { background: #fff; border-radius: 16px; padding: 20px; max-width: 520px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,.18); }
+    .modal h3 { color: var(--brand); font-size: 24px; margin: 0 0 8px; text-align: center; }
+    .modal p { text-align: center; margin: 0 0 12px; }
+    .redeem { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; }
+    .redeem .code { font-size: 28px; font-weight: 900; letter-spacing: .2em; text-align: center; }
+    .redeem .ts { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
+
+    .footer { text-align: center; color: var(--muted); font-size: 12px; margin: 20px 0; }
+
+    /* Mobile spacing */
+    @media (min-width: 600px) {
+      .wheel-wrap { width: 360px; height: 360px; }
+      .wheel { width: 360px; height: 360px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="center">
+      <!-- Optional: Logo eurer Firma – Bilddatei in das Repo hochladen und src anpassen -->
+      <img id="logo" class="logo" alt="Logo" src="" />
+      <h1 class="title" id="app-title">Drehe & Gewinne!</h1>
+      <p class="subtitle" id="app-sub">Scanne per QR & drehe das Rad – ohne App.</p>
+      <div class="badge">Kein Download · Keine Werbung · Smartphone‑ready</div>
+    </header>
+
+    <section class="wheel-wrap">
+      <div class="pointer"><div class="tri"></div></div>
+      <div id="wheel" class="wheel">
+        <svg id="wheel-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <circle cx="50" cy="50" r="49" fill="#fff"/>
+          <!-- Segmente werden per JS eingefügt -->
+          <circle cx="50" cy="50" r="6.5" fill="var(--brand)"/>
+        </svg>
+      </div>
+    </section>
+
+    <div class="center">
+      <button id="spin-btn" class="btn">JETZT DREHEN</button>
+      <div id="spin-helper" class="helper"></div>
+    </div>
+
+    <section class="panel" style="margin-top:18px">
+      <h2 style="margin:0 0 6px; font-size:16px">Für das Orga‑Team</h2>
+      <p class="helper" style="margin:0 0 10px">QR‑Code zur aktuell geöffneten URL generieren (zum Ausdrucken):</p>
+      <div>
+        <button id="qr-btn" class="btn secondary">QR‑Code erzeugen</button>
+        <a id="qr-download" href="#" download="gluecksrad-qr.png" style="margin-left:10px; font-size:14px; display:none">QR‑Code als PNG herunterladen</a>
+      </div>
+      <div id="qrcode" style="margin-top:12px"></div>
+    </section>
+
+    <div class="footer">
+      Tipp: Diese Seite kann kostenlos auf GitHub Pages gehostet werden.
+    </div>
+  </div>
+
+  <!-- Libs: Konfetti & QRCode (Browser-CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <div id="modal" class="modal-backdrop">
+    <div class="modal">
+      <h3>Glückwunsch!</h3>
+      <p id="winner-text"></p>
+      <div class="redeem">
+        <div class="code" id="redeem-code">— — —</div>
+        <div class="ts" id="redeem-ts"></div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:14px; justify-content:center">
+        <button class="btn" id="close-modal">Schließen</button>
+        <button class="btn secondary" id="confetti-more">🎉 Nochmal Konfetti</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======= KONFIGURATION =======
+    const CONFIG = {
+      title: "Drehe & Gewinne!",
+      subtitle: "Scanne per QR & drehe das Rad – ohne App.",
+      brandColor: getComputedStyle(document.documentElement).getPropertyValue('--brand').trim(),
+      logoUrl: "", // z.B. "logo.png" (Datei ins Repo hochladen)
+      spinsPerDay: 1, // pro Gerät & Tag
+      prizes: [
+        { label: "Hauptpreis", sub: "Gutschein 100 €" },
+        { label: "Goodie‑Bag", sub: "Messe‑Set" },
+        { label: "Kaffee‑Gutschein", sub: "Café am Stand" },
+        { label: "Rabattcode", sub: "−20% Aktion" },
+        { label: "Danke fürs Mitmachen", sub: "Nächstes Mal!" },
+        { label: "Mini‑Preis", sub: "Sticker & Kuli" }
+      ]
+    };
+
+    // ======= INIT UI =======
+    document.getElementById('app-title').textContent = CONFIG.title;
+    document.getElementById('app-sub').textContent = CONFIG.subtitle;
+    if (CONFIG.logoUrl) document.getElementById('logo').src = CONFIG.logoUrl; else document.getElementById('logo').style.display = 'none';
+
+    const wheelEl = document.getElementById('wheel');
+    const svg = document.getElementById('wheel-svg');
+    const segmentCount = CONFIG.prizes.length;
+    const anglePerSegment = 360 / segmentCount;
+
+    // Segmente zeichnen
+    const hueBase = 200;
+    for (let i = 0; i < segmentCount; i++) {
+      const startAngle = i * anglePerSegment;
+      const endAngle = (i + 1) * anglePerSegment;
+      const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+      const radius = 49;
+      const x1 = 50 + radius * Math.cos((Math.PI * startAngle) / 180);
+      const y1 = 50 + radius * Math.sin((Math.PI * startAngle) / 180);
+      const x2 = 50 + radius * Math.cos((Math.PI * endAngle) / 180);
+      const y2 = 50 + radius * Math.sin((Math.PI * endAngle) / 180);
+      const pathData = `M 50 50 L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+
+      const hue = (hueBase + i * (360 / segmentCount)) % 360;
+      const fill = `hsl(${hue} 80% 65%)`;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('fill', fill);
+      path.setAttribute('stroke', 'white');
+      path.setAttribute('stroke-width', '0.6');
+      svg.insertBefore(path, svg.lastElementChild); // vor die Center-Kappe
+
+      // Text
+      const midAngle = startAngle + anglePerSegment / 2;
+      const tx = 50 + 32 * Math.cos((Math.PI * midAngle) / 180);
+      const ty = 50 + 32 * Math.sin((Math.PI * midAngle) / 180);
+      const rotate = midAngle + 90;
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('transform', `translate(${tx}, ${ty}) rotate(${rotate})`);
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x', 0);
+      text.setAttribute('y', 0);
+      text.setAttribute('font-size', '3.5');
+      text.setAttribute('font-weight', '700');
+      text.setAttribute('fill', '#111827');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'middle');
+      text.textContent = CONFIG.prizes[i].label;
+      g.appendChild(text);
+      svg.insertBefore(g, svg.lastElementChild);
+    }
+
+    // ======= Spin-Logik =======
+    let totalRotation = 0;
+    let spinning = false;
+    let winnerIndex = null;
+
+    function todayKey() {
+      const d = new Date();
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      return `gluecksrad-spins-${key}`;
+    }
+    function spinsUsed() {
+      return parseInt(localStorage.getItem(todayKey()) || '0', 10);
+    }
+    function updateHelper() {
+      const used = spinsUsed();
+      const left = Math.max(0, CONFIG.spinsPerDay - used);
+      document.getElementById('spin-helper').textContent = left > 0
+        ? `Verfügbar: ${left}/${CONFIG.spinsPerDay} Dreh${CONFIG.spinsPerDay === 1 ? '' : 'e'} heute`
+        : `Heute schon gespielt – morgen wieder!`;
+      document.getElementById('spin-btn').disabled = left === 0 || spinning;
+    }
+
+    function pickWinnerIndex() {
+      // Gleichverteilte Auswahl; kann gewichtet werden
+      return Math.floor(Math.random() * segmentCount);
+    }
+
+    function spin() {
+      const left = Math.max(0, CONFIG.spinsPerDay - spinsUsed());
+      if (spinning || left === 0) return;
+      spinning = true;
+      winnerIndex = pickWinnerIndex();
+
+      const targetAngle = winnerIndex * anglePerSegment + anglePerSegment/2; // Mitte des Segments
+      const extraSpins = 6 + Math.floor(Math.random() * 4); // 6–9 Umdrehungen
+      const finalRotation = 360 * extraSpins + (360 - targetAngle);
+      totalRotation += finalRotation;
+
+      wheelEl.classList.add('spin');
+      wheelEl.style.transform = `rotate(${totalRotation}deg)`;
+    }
+
+    wheelEl.addEventListener('transitionend', () => {
+      if (!spinning) return;
+      spinning = false;
+      try { confetti({ particleCount: 120, spread: 70, origin: { y: 0.3 } }); } catch (e) {}
+      const used = spinsUsed();
+      localStorage.setItem(todayKey(), String(Math.min(used + 1, CONFIG.spinsPerDay)));
+      updateHelper();
+      showWinner();
+    });
+
+    function redeemInfo() {
+      const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+      const t = new Date();
+      const ts = `${String(t.getDate()).padStart(2,'0')}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getFullYear()).slice(-2)} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+      return { rand, ts };
+    }
+
+    function showWinner() {
+      const prize = CONFIG.prizes[winnerIndex];
+      const text = prize.sub ? `${prize.label}\n${prize.sub}` : prize.label;
+      document.getElementById('winner-text').innerText = text;
+      const { rand, ts } = redeemInfo();
+      document.getElementById('redeem-code').innerText = rand;
+      document.getElementById('redeem-ts').innerText = `Zeitstempel: ${ts}`;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+      document.getElementById('modal').style.display = 'none';
+    });
+    document.getElementById('confetti-more').addEventListener('click', () => {
+      try { confetti({ particleCount: 100, spread: 60 }); } catch(e){}
+    });
+    document.getElementById('spin-btn').addEventListener('click', spin);
+
+    // QR‑Code erstellen
+    document.getElementById('qr-btn').addEventListener('click', () => {
+      const container = document.getElementById('qrcode');
+      container.innerHTML = '';
+      const q = new QRCode(container, { text: window.location.href, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+      // Download-Link anbieten
+      setTimeout(() => {
+        const img = container.querySelector('img');
+        if (img) {
+          const a = document.getElementById('qr-download');
+          a.href = img.src;
+          a.style.display = 'inline';
+        }
+      }, 100);
+    });
+
+    updateHelper();
+  </script>
+</body>
+</html>
