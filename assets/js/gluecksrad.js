@@ -116,16 +116,23 @@ confettiBtn.addEventListener("click", () => {
 });
 
 // Einfaches Konfetti
-function startConfetti() {
-  for (let i = 0; i < 30; i++) {
-    const confetti = document.createElement("div");
-    confetti.classList.add("confetti");
-    confetti.style.left = Math.random() * 100 + "vw";
-    confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
-    document.body.appendChild(confetti);
-
-    setTimeout(() => {
-      confetti.remove();
-    }, 5000);
-  }
+function launchConfetti(){
+  const end = Date.now() + 2000;
+  const colors = ['#efd729','#ccc','#fff','#888'];
+  (function frame(){
+    const duration = Date.now() - end + 2000;
+    if(duration < 2000){
+      const confetti = document.createElement('div');
+      confetti.style.position = 'absolute';
+      confetti.style.width = confetti.style.height = Math.random()*10+5+'px';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+      confetti.style.left = Math.random()*window.innerWidth + 'px';
+      confetti.style.top = '0px';
+      confetti.style.opacity = Math.random();
+      confetti.style.borderRadius = '50%';
+      document.body.appendChild(confetti);
+      setTimeout(()=>confetti.remove(),2000);
+      requestAnimationFrame(frame);
+    }
+  })();
 }
