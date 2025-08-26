@@ -117,22 +117,34 @@ confettiBtn.addEventListener("click", () => {
 
 // Einfaches Konfetti
 function launchConfetti(){
-  const end = Date.now() + 2000;
   const colors = ['#efd729','#ccc','#fff','#888'];
-  (function frame(){
-    const duration = Date.now() - end + 2000;
-    if(duration < 2000){
-      const confetti = document.createElement('div');
-      confetti.style.position = 'absolute';
-      confetti.style.width = confetti.style.height = Math.random()*10+5+'px';
-      confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-      confetti.style.left = Math.random()*window.innerWidth + 'px';
-      confetti.style.top = '0px';
-      confetti.style.opacity = Math.random();
-      confetti.style.borderRadius = '50%';
-      document.body.appendChild(confetti);
-      setTimeout(()=>confetti.remove(),2000);
-      requestAnimationFrame(frame);
-    }
-  })();
+  const confettiCount = 100; // Anzahl der Konfetti-Stücke
+
+  for(let i=0; i<confettiCount; i++){
+    const confetti = document.createElement('div');
+    confetti.style.position = 'fixed'; // fixed für ganzen Viewport
+    confetti.style.width = confetti.style.height = Math.random()*10+5+'px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    confetti.style.left = Math.random()*window.innerWidth + 'px';
+    confetti.style.top = '-20px'; // Start oberhalb des Bildschirms
+    confetti.style.opacity = Math.random();
+    confetti.style.borderRadius = '50%';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.zIndex = 9999;
+
+    document.body.appendChild(confetti);
+
+    // Animation
+    const fallDuration = Math.random()*2000 + 2000; // 2-4 Sekunden
+    confetti.animate([
+      { transform: `translateY(0px) rotate(0deg)` },
+      { transform: `translateY(${window.innerHeight + 20}px) rotate(${Math.random()*360}deg)` }
+    ], {
+      duration: fallDuration,
+      easing: 'linear'
+    });
+
+    // Nach Ablauf entfernen
+    setTimeout(() => confetti.remove(), fallDuration);
+  }
 }
