@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glücksrad BVG Projekt GmbH</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -15,66 +9,12 @@
     margin: 0;
   }
 
-  .wheel-container {
-    position: relative;
-    width: 90vw;
-    max-width: 500px;
-    margin: 20px 0;
-  }
-
-  canvas {
-    width: 100%;
-    border-radius: 50%;
-  }
-
-  .logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 30%;
-    max-height: 30%;
-    pointer-events: none;
-  }
-
-  /* Zeiger oben */
-  .pointer {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid #e60000;
-  }
-
-  .spin-button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    font-size: 18px;
-    cursor: pointer;
-    background-color: #efd729;
-    border: none;
-    border-radius: 8px;
-    transition: background 0.3s;
-  }
-  .spin-button:hover {
-    background-color: #e6cd24;
-  }
-
-  .result {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 16px;
-    max-width: 400px;
-    line-height: 1.4;
-  }
+  /* … dein bestehendes CSS … */
 
   .links {
     margin-top: 15px;
     font-size: 16px;
+    text-align: center; /* <-- hier eingefügt */
   }
 
   .links a {
@@ -84,125 +24,159 @@
     font-weight: bold;
   }
 </style>
+Danach die Datei speichern und auf GitHub neu hochladen/committen – dann wird der Text „Lassen Sie uns in Kontakt bleiben:“ mittig erscheinen.
+
+👉 Soll ich dir den fertigen, korrigierten index.html-Code hier komplett einfügen, damit du ihn nur noch ersetzen musst?
+
+
+
+
+
+
+
+Du:
+ja bitte
+
+
+ChatGPT:
+Perfekt – hier bekommst du deinen vollständig angepassten index.html-Code, in dem der Text „Lassen Sie uns in Kontakt bleiben“ nun wirklich zentriert ist. 🎯
+
+html
+Kopieren
+Bearbeiten
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BVG Projekt GmbH Glücksrad</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    header {
+      padding: 20px;
+    }
+
+    .logo {
+      width: 150px;
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      color: #555;
+    }
+
+    canvas {
+      margin: 20px auto;
+      display: block;
+    }
+
+    button {
+      background-color: #FFD700;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    #dailyInfo {
+      margin-top: 10px;
+      color: #333;
+    }
+
+    /* Popup */
+    .popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup.hidden { display: none; }
+
+    .popup-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .black-btn {
+      background: black;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .white-btn {
+      background: white;
+      border: 2px solid black;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Links */
+    .links {
+      text-align: center; /* <-- sorgt für Zentrierung */
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    .links p {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    .links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0055a5;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-<div class="wheel-container">
-  <canvas id="wheel"></canvas>
-  <img src="assets/img/BVG-PROJEKT-Logo_Color_RGB.png" alt="BVG Projekt GmbH" class="logo">
-  <div class="pointer"></div>
-</div>
+  <header>
+    <img src="assets/img/BVG-PROJEKT-Logo_Color_RGB.png" alt="BVG Projekt Logo" class="logo">
+    <div class="subtitle">Herzlich willkommen beim BVG Projekt GmbH Glücksrad!</div>
+  </header>
 
-<button class="spin-button" id="spin">JETZT DREHEN</button>
+  <canvas id="wheelCanvas" width="500" height="500"></canvas>
+  <button id="spinBtn">Drehen</button>
+  <div id="dailyInfo"></div>
 
-<div class="result" id="result">Verfügbar: 1/1 Dreh heute</div>
+  <!-- Links -->
+  <div class="links">
+    <p>Lassen Sie uns in Kontakt bleiben:</p>
+    <a href="https://bvg-projekt.de/" target="_blank">Website</a> |
+    <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank">LinkedIn</a> |
+    <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">YouTube</a>
+  </div>
 
-<div class="links">
-  <p>Lassen Sie uns in Kontakt bleiben:</p>
-  <a href="https://bvg-projekt.de/" target="_blank">Website</a> |
-  <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank">LinkedIn</a> |
-  <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">YouTube</a>
-</div>
-
-<script>
-const canvas = document.getElementById('wheel');
-const ctx = canvas.getContext('2d');
-let width = canvas.width = canvas.offsetWidth;
-let height = canvas.height = canvas.offsetWidth;
-const center = width / 2;
-
-const segments = [
-  {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
-  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
-  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
-  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
-  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
-  {color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false}
-];
-
-// Zufällige Reihenfolge
-segments.sort(() => Math.random() - 0.5);
-
-let angle = 0;
-const arc = 2 * Math.PI / segments.length;
-
-function drawWheel() {
-  for(let i=0; i<segments.length; i++){
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
-    ctx.fillStyle = segments[i].color;
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-}
-
-function spinWheel() {
-  const spins = Math.random() * 10 + 10; // 10-20 Umdrehungen
-  let currentAngle = 0;
-  const duration = 4000; // 4 Sekunden
-  const start = performance.now();
-
-  function animate(time) {
-    let elapsed = time - start;
-    let progress = elapsed / duration;
-    if(progress > 1) progress = 1;
-
-    // Ease-out Effekt (langsam bremsen)
-    let eased = 1 - Math.pow(1 - progress, 3);
-    angle = (spins * 2 * Math.PI * eased) % (2 * Math.PI);
-    drawWheel();
-
-    if(progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      const index = Math.floor((2 * Math.PI - angle) / arc) % segments.length;
-      showResult(segments[index]);
-    }
-  }
-  requestAnimationFrame(animate);
-}
-
-function showResult(segment){
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerText = segment.message;
-  if(segment.confetti){
-    launchConfetti();
-  }
-}
-
-function launchConfetti(){
-  const end = Date.now() + 2000;
-  const colors = ['#efd729','#ccc','#fff','#888'];
-  (function frame(){
-    const duration = Date.now() - end + 2000;
-    if(duration < 2000){
-      const confetti = document.createElement('div');
-      confetti.style.position = 'absolute';
-      confetti.style.width = confetti.style.height = Math.random()*10+5+'px';
-      confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-      confetti.style.left = Math.random()*window.innerWidth + 'px';
-      confetti.style.top = '0px';
-      confetti.style.opacity = Math.random();
-      confetti.style.borderRadius = '50%';
-      document.body.appendChild(confetti);
-      setTimeout(()=>confetti.remove(),2000);
-      requestAnimationFrame(frame);
-    }
-  })();
-}
-
-drawWheel();
-
-document.getElementById('spin').addEventListener('click', spinWheel);
-
-window.addEventListener('resize', () => {
-  width = canvas.width = canvas.offsetWidth;
-  height = canvas.height = canvas.offsetWidth;
-  drawWheel();
-});
-</script>
+  <script src="assets/js/script.js"></script>
 </body>
 </html>
