@@ -78,18 +78,28 @@
 
 <div class="wheel-container">
   <canvas id="wheel"></canvas>
-  <img src="logo.svg" alt="BVG Projekt GmbH" class="logo">
+ <img src="images/BVG-PROJEKT-Logo_Color_RGB.png" alt="BVG Projekt GmbH" class="logo">
 </div>
 
+  .logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 30%; /* ggf. kleiner oder größer */
+  max-height: 30%;
+  pointer-events: none;
+}
+  
 <button class="spin-button" id="spin">Drehen</button>
 
 <div class="result" id="result">Verfügbar: 1/1 Dreh heute</div>
 
 <div class="links">
   Lassen Sie uns in Kontakt bleiben:
-  <a href="https://bvg-projekt.de/" target="_blank">🌐 Website</a> |
-  <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank">💼 LinkedIn</a> |
-  <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">🎥 YouTube</a>
+  <a href="https://bvg-projekt.de/" target="_blank"> Website</a> |
+  <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank"> LinkedIn</a> |
+  <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank"> YouTube</a>
 </div>
 
 <script>
