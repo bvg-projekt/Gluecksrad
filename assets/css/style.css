@@ -80,3 +80,13 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.links {
+  text-align: center;
+  margin-top: 20px; /* Abstand nach oben */
+}
+
+.links p {
+  font-weight: bold;  /* macht die Überschrift markanter */
+  margin-bottom: 8px; /* Abstand zwischen Text und Links */
+}
