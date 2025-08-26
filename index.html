@@ -43,17 +43,18 @@
     pointer-events: none;
   }
 
-.pointer {
-  position: absolute;
-  bottom: -10px;        /* Pfeil jetzt unten */
-  left: 50%;
-  transform: translateX(-50%) rotate(180deg); /* 180° drehen */
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 20px solid #000000; /* Spitze schwarz */
-}
+  /* Pfeil oben, schwarz */
+  .pointer {
+    position: absolute;
+    top: -20px; /* oberhalb des Rads */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid #000000; /* Spitze schwarz */
+  }
 
   .spin-button {
     padding: 12px 30px;
@@ -106,6 +107,7 @@
 </div>
 
 <button class="spin-button" id="spin">JETZT DREHEN</button>
+<div class="result" id="result">Verfügbar: 1/1 Dreh heute</div>
 
 <div class="links">
   <p>Lassen Sie uns in Kontakt bleiben:</p>
@@ -151,8 +153,8 @@ function drawWheel() {
 }
 
 function spinWheel() {
-  const spins = Math.random() * 10 + 10; // 10-20 Umdrehungen
-  const duration = 4000; // 4 Sekunden
+  const spins = Math.random() * 10 + 10;
+  const duration = 4000;
   const start = performance.now();
 
   function animate(time) {
@@ -177,13 +179,13 @@ function showResult(segment){
   if(segment.confetti) launchConfetti();
 }
 
-// Explodierendes Konfetti vom Rad
 function launchConfetti(){
   const confettiCount = 100;
   const confettiElements = [];
   const colors = ['#efd729','#ccc','#fff','#888'];
-  const centerX = window.innerWidth / 2;
-  const centerY = document.querySelector('.wheel-container').offsetTop + document.querySelector('.wheel-container').offsetHeight / 2;
+  const container = document.querySelector('.wheel-container');
+  const centerX = container.offsetLeft + container.offsetWidth/2;
+  const centerY = container.offsetTop + container.offsetHeight/2;
 
   for(let i=0; i<confettiCount; i++){
     const confetti = document.createElement('div');
@@ -249,4 +251,5 @@ window.addEventListener('resize', () => {
 
 </body>
 </html>
+
 
