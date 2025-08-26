@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glücksrad BVG Projekt GmbH</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+  }
+
+  .wheel-container {
+    position: relative;
+    width: 90vw;
+    max-width: 500px;
+    margin: 20px 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    border-radius: 50%;
+  }
+
+  canvas {
+    width: 100%;
+    border-radius: 50%;
+  }
+
+  .logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 30%;
+    max-height: 30%;
+    pointer-events: none;
+  }
+
+  .spin-button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #efd729;
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s;
+  }
+  .spin-button:hover {
+    background-color: #e6cd24;
+  }
+
+  .result {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 16px;
+    max-width: 400px;
+    line-height: 1.4;
+  }
+
+  .links {
+    margin-top: 15px;
+    font-size: 16px;
+  }
+
+  .links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #0055a5;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="wheel-container">
+  <canvas id="wheel"></canvas>
+  <img src="logo.svg" alt="BVG Projekt GmbH" class="logo">
+</div>
+
+<button class="spin-button" id="spin">Drehen</button>
+
+<div class="result" id="result">Verfügbar: 1/1 Dreh heute</div>
+
+<div class="links">
+  Lassen Sie uns in Kontakt bleiben:
+  <a href="https://bvg-projekt.de/" target="_blank">🌐 Website</a> |
+  <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank">💼 LinkedIn</a> |
+  <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">🎥 YouTube</a>
+</div>
+
+<script>
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = canvas.offsetWidth;
+let height = canvas.height = canvas.offsetWidth;
+const center = width / 2;
+
+const segments = [
+  {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
+  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
+  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
+  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
+  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
+  {color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false}
+];
+
+// Zufällige Reihenfolge
+segments.sort(() => Math.random() - 0.5);
+
+let angle = 0;
+const arc = 2 * Math.PI / segments.length;
+
+function drawWheel() {
+  for(let i=0; i<segments.length; i++){
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
+    ctx.fillStyle = segments[i].color;
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+}
+
+function spinWheel() {
+  const spins = Math.floor(Math.random()*5 + 5);
+  const duration = 3000;
+  const start = performance.now();
+
+  function animate(time){
+    let elapsed = time - start;
+    if(elapsed < duration){
+      angle += 0.1 + 0.05 * Math.sin(elapsed / 50);
+      drawWheel();
+      requestAnimationFrame(animate);
+    } else {
+      drawWheel();
+      const index = Math.floor((2 * Math.PI - angle % (2*Math.PI)) / arc) % segments.length;
+      showResult(segments[index]);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showResult(segment){
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerText = segment.message;
+  if(segment.confetti){
+    launchConfetti();
+  }
+}
+
+function launchConfetti(){
+  const end = Date.now() + 2000;
+  const colors = ['#efd729','#ccc','#fff','#888'];
+  (function frame(){
+    const duration = Date.now() - end + 2000;
+    if(duration < 2000){
+      const confetti = document.createElement('div');
+      confetti.style.position = 'absolute';
+      confetti.style.width = confetti.style.height = Math.random()*10+5+'px';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+      confetti.style.left = Math.random()*window.innerWidth + 'px';
+      confetti.style.top = '0px';
+      confetti.style.opacity = Math.random();
+      confetti.style.borderRadius = '50%';
+      document.body.appendChild(confetti);
+      setTimeout(()=>confetti.remove(),2000);
+      requestAnimationFrame(frame);
+    }
+  })();
+}
+
+drawWheel();
+
+document.getElementById('spin').addEventListener('click', spinWheel);
+
+window.addEventListener('resize', () => {
+  width = canvas.width = canvas.offsetWidth;
+  height = canvas.height = canvas.offsetWidth;
+  drawWheel();
+});
+</script>
+</body>
+</html>
