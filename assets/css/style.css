@@ -83,10 +83,11 @@ button {
 
 .links {
   text-align: center;
-  margin-top: 20px; /* Abstand nach oben */
+  margin-top: 20px;
 }
 
 .links p {
-  font-weight: bold;  /* macht die Überschrift markanter */
-  margin-bottom: 8px; /* Abstand zwischen Text und Links */
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.1em;
 }
