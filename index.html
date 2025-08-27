@@ -158,24 +158,34 @@ function drawWheel() {
 }
 
 function spinWheel() {
-  const spins = Math.random() * 10 + 10;
-  const duration = 4000;
+  const randomSlice = Math.floor(Math.random() * segments.length);
+  const sliceAngle = arc; // arc = 2 * Math.PI / segments.length
+  const spins = 6; // Anzahl voller Umdrehungen
+  const finalAngle = randomSlice * sliceAngle + sliceAngle / 2;
+
+  const targetRotation = spins * 2 * Math.PI - finalAngle;
+
+  const duration = 6000; // länger drehen
   const start = performance.now();
 
   function animate(time) {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
+
+    // easing für sanftes Ausrollen
     let eased = 1 - Math.pow(1 - progress, 3);
-    angle = (spins * 2 * Math.PI * eased) % (2 * Math.PI);
+
+    angle = (targetRotation * eased) % (2 * Math.PI);
     drawWheel();
 
-    if(progress < 1) {
+    if (progress < 1) {
       requestAnimationFrame(animate);
     } else {
-      const index = Math.floor((2 * Math.PI - angle) / arc) % segments.length;
+      const index = (segments.length - 1 - randomSlice + segments.length) % segments.length;
       showResult(segments[index]);
     }
   }
+
   requestAnimationFrame(animate);
 }
 
