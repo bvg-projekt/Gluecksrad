@@ -34,19 +34,21 @@
   }
 
   /* Logo mit Kreis-Hintergrund */
-  .logo-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 50%;
-    padding: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.logo-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 50%;
+  width: 120px;      /* feste Breite */
+  height: 120px;     /* gleiche Höhe für Kreis */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  padding: 15px;     /* optional */
+}
 
   .logo-container img {
     max-width: 50%;
