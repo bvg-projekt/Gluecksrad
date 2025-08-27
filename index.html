@@ -171,7 +171,8 @@ function drawWheel() {
 
 function spinWheel() {
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc;
+const targetAngle = randomSlice * arc + arc / 2; // neue Zeile
+
 
   const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
