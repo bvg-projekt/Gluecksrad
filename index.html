@@ -40,7 +40,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
-    border-radius: 50%;        
+    border-radius: 50%;
     width: 140px;
     height: 140px;
     display: flex;
@@ -51,19 +51,19 @@
   }
 
   .logo-container img {
-    max-width: 90%;
-    max-height: 90%;
+    width: 90%;
+    height: 90%;
     object-fit: contain;
     display: block;
     pointer-events: none;
   }
 
-  /* Pfeil oben, schwarz */
+  /* Pfeil über dem Rad */
   .pointer {
     position: absolute;
     top: -30px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) rotate(0deg); /* Pfeil nach unten */
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
@@ -151,7 +151,9 @@ const segments = [
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let angle = -arc / 2; // Startwinkel: erstes Segment genau unter Pfeil
+
+// Startwinkel so, dass erstes Segment unter dem Pfeil liegt
+let angle = -Math.PI / 2;
 
 function drawWheel() {
   ctx.clearRect(0, 0, width, height);
@@ -169,7 +171,8 @@ function drawWheel() {
 
 function spinWheel() {
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc / 2; // Mitte des Segments
+  const targetAngle = randomSlice * arc;
+
   const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
 
@@ -180,7 +183,7 @@ function spinWheel() {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
     let eased = 1 - Math.pow(1 - progress, 3);
-    angle = (targetRotation * eased) % (2 * Math.PI);
+    angle = (-Math.PI/2 + targetRotation * eased) % (2 * Math.PI);
     drawWheel();
 
     if(progress < 1) {
