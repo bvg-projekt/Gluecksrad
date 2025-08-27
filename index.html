@@ -40,21 +40,21 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  border-radius: 50%;
-  width: 120px;      /* feste Breite */
-  height: 120px;     /* gleiche Höhe für Kreis */
+  border-radius: 50%;        /* rund */
+  width: 30%;                 /* 30% der Canvas-Breite */
+  aspect-ratio: 1 / 1;       /* sorgt für perfekte Kreisform */
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  padding: 15px;     /* optional */
+  padding: 10%;              /* proportional zum Kreis */
 }
 
-  .logo-container img {
-    max-width: 50%;
-    max-height: 50%;
-    pointer-events: none;
-  }
+.logo-container img {
+  max-width: 60%;             /* Logo passt sich proportional an */
+  max-height: 60%;
+  pointer-events: none;
+}
 
   /* Pfeil unten, schwarz */
   .pointer {
