@@ -33,35 +33,39 @@
     display: block;
   }
 
-  .logo {
+  /* Logo mit Kreis-Hintergrund */
+  .logo-container {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 40%;
-    max-height: 40%;
+    background: white;
+    border-radius: 50%;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .logo-container img {
+    max-width: 50%;
+    max-height: 50%;
     pointer-events: none;
   }
 
-    /* Kreis-Hintergrund */
-  background: white;      /* Hintergrundfarbe, ggf. BVG-gelb oder grau */
-  border-radius: 50%;     /* macht es rund */
-  padding: 15px;          /* Abstand zum Logo, damit der Kreis sichtbar ist */
-  box-shadow: 0 0 10px rgba(0,0,0,0.2); /* optional: leichter Schatten */
-}
-
-  
   /* Pfeil oben, schwarz */
   .pointer {
     position: absolute;
-    top: -20px; /* oberhalb des Rads */
+    top: -30px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) rotate(0deg);
     width: 0;
     height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid #000000; /* Spitze schwarz */
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 25px solid black;
+    z-index: 10;
   }
 
   .spin-button {
@@ -105,12 +109,14 @@
 <body>
 
 <header>
-  <h1>Kurbelt unseren Planeten wieder an mit dem BVG Projekt GmbH Glücksrad!</h1>
+  <h1>Kurbelt unseren Planeten wieder an mit dem <strong>BVG Projekt GmbH</strong> Glücksrad!</h1>
 </header>
 
 <div class="wheel-container">
   <canvas id="wheel"></canvas>
-  <img src="assets/img/BVG-PROJEKT-Logo_Color_RGB.png" alt="BVG Projekt GmbH" class="logo">
+  <div class="logo-container">
+    <img src="assets/img/BVG-PROJEKT-Logo_Color_RGB.png" alt="BVG Projekt GmbH">
+  </div>
   <div class="pointer"></div>
 </div>
 
@@ -131,6 +137,7 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
+// Segmente: Gelb oben, dann abwechselnd andere Farben
 const segments = [
   {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
   {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
@@ -158,31 +165,27 @@ function drawWheel() {
 }
 
 function spinWheel() {
+  // Zufälliges Segment auswählen
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const sliceAngle = arc; // arc = 2 * Math.PI / segments.length
-  const spins = 6; // Anzahl voller Umdrehungen
+  const sliceAngle = arc;
+  const spins = 6; // volle Umdrehungen
   const finalAngle = randomSlice * sliceAngle + sliceAngle / 2;
+  const targetRotation = spins * 2 * Math.PI + finalAngle;
 
-  const targetRotation = spins * 2 * Math.PI - finalAngle;
-
-  const duration = 6000; // länger drehen
+  const duration = 7000; // langsam ausrollen
   const start = performance.now();
 
   function animate(time) {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
-
-    // easing für sanftes Ausrollen
-    let eased = 1 - Math.pow(1 - progress, 3);
-
+    let eased = 1 - Math.pow(1 - progress, 3); // sanftes Ausrollen
     angle = (targetRotation * eased) % (2 * Math.PI);
     drawWheel();
 
-    if (progress < 1) {
+    if(progress < 1) {
       requestAnimationFrame(animate);
     } else {
-      const index = (segments.length - 1 - randomSlice + segments.length) % segments.length;
-      showResult(segments[index]);
+      showResult(segments[randomSlice]);
     }
   }
 
@@ -266,5 +269,6 @@ window.addEventListener('resize', () => {
 
 </body>
 </html>
+
 
 
