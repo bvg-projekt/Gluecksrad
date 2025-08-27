@@ -33,40 +33,37 @@
     display: block;
   }
 
+  /* Logo mit Kreis-Hintergrund */
+  .logo-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 50%;        
+    width: 140px;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    padding: 0;
+  }
 
-/* Logo mit Kreis-Hintergrund */
-.logo-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 50%;        
-  width: 140px;           /* gewünschte Kreisgröße */
-  height: 140px;          /* gleich wie Breite für Kreis */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  padding: 0;             /* optional minimal */
-}
+  .logo-container img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
 
-.logo-container img {
-  max-width: 90%;          /* Logo füllt den Kreis groß aus */
-  max-height: 90%;
-  object-fit: contain;     /* proportional skalieren */
-  display: block;
-  pointer-events: none;
-}
-
-
-
-  /* Pfeil unten, schwarz */
+  /* Pfeil oben, schwarz */
   .pointer {
     position: absolute;
     top: -30px;
     left: 50%;
-    transform: translateX(-50%) rotate(180deg);
+    transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
@@ -144,7 +141,6 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
-// Segmente: Gelb oben, dann abwechselnd andere Farben
 const segments = [
   {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
   {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
@@ -154,8 +150,8 @@ const segments = [
   {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}
 ];
 
-let angle = 0;
 const arc = 2 * Math.PI / segments.length;
+let angle = -arc / 2; // Startwinkel: erstes Segment genau unter Pfeil
 
 function drawWheel() {
   ctx.clearRect(0, 0, width, height);
@@ -171,25 +167,19 @@ function drawWheel() {
   }
 }
 
-let angle = -arc / 2; // Startwinkel: erstes Segment genau unter dem Pfeil
-
 function spinWheel() {
-  // Zufälliges Segment auswählen
   const randomSlice = Math.floor(Math.random() * segments.length);
-
-  // Zielwinkel: exakte Mitte des gewählten Segments
-  const targetAngle = randomSlice * arc + arc / 2;
-
-  const spins = 6; // volle Umdrehungen
+  const targetAngle = randomSlice * arc + arc / 2; // Mitte des Segments
+  const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
 
-  const duration = 7000; // Drehdauer in ms
+  const duration = 7000;
   const start = performance.now();
 
   function animate(time) {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
-    let eased = 1 - Math.pow(1 - progress, 3); // sanftes Ausrollen
+    let eased = 1 - Math.pow(1 - progress, 3);
     angle = (targetRotation * eased) % (2 * Math.PI);
     drawWheel();
 
@@ -280,6 +270,3 @@ window.addEventListener('resize', () => {
 
 </body>
 </html>
-
-
-
