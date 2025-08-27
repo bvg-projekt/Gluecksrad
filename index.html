@@ -41,23 +41,24 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  border-radius: 50%;
-  width: auto;           /* passt sich der Logo-Größe an */
-  height: auto;          /* passt sich der Logo-Größe an */
-  display: inline-flex;  /* nur so groß wie der Inhalt */
+  border-radius: 50%;        
+  width: 140px;           /* gewünschte Kreisgröße */
+  height: 140px;          /* gleich wie Breite für Kreis */
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;         /* Abstand zwischen Logo und Kreisrand */
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  padding: 0;             /* optional minimal */
 }
 
 .logo-container img {
-  width: 120px;          /* feste Größe für das Logo */
-  height: auto;          /* proportional */
+  max-width: 90%;          /* Logo füllt den Kreis groß aus */
+  max-height: 90%;
+  object-fit: contain;     /* proportional skalieren */
   display: block;
-  object-fit: contain;
   pointer-events: none;
 }
+
 
 
   /* Pfeil unten, schwarz */
