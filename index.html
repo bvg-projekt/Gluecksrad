@@ -35,29 +35,30 @@
 
 
 /* Logo mit Kreis-Hintergrund */
-/* Logo mit Kreis-Hintergrund */
 .logo-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  border-radius: 50%;       
-  width: 55%;               /* größer als vorher */
-  aspect-ratio: 1 / 1;      
-  display: flex;
+  border-radius: 50%;
+  width: auto;           /* passt sich der Logo-Größe an */
+  height: auto;          /* passt sich der Logo-Größe an */
+  display: inline-flex;  /* nur so groß wie der Inhalt */
   justify-content: center;
   align-items: center;
+  padding: 10px;         /* Abstand zwischen Logo und Kreisrand */
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  padding: 2%;              /* klein, damit Logo mehr Platz hat */
 }
 
 .logo-container img {
-  width: 90%;               /* Logo fast maximal im Kreis */
-  height: 90%;
-  object-fit: contain;      /* Logo proportional skalieren */
+  width: 120px;          /* feste Größe für das Logo */
+  height: auto;          /* proportional */
+  display: block;
+  object-fit: contain;
   pointer-events: none;
 }
+
 
   /* Pfeil unten, schwarz */
   .pointer {
