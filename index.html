@@ -171,15 +171,19 @@ function drawWheel() {
   }
 }
 
+let angle = -arc / 2; // Startwinkel: erstes Segment genau unter dem Pfeil
+
 function spinWheel() {
   // Zufälliges Segment auswählen
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const sliceAngle = arc;
-  const spins = 6; // volle Umdrehungen
-  const finalAngle = randomSlice * sliceAngle + sliceAngle / 2;
-  const targetRotation = spins * 2 * Math.PI + finalAngle;
 
-  const duration = 7000; // langsam ausrollen
+  // Zielwinkel: exakte Mitte des gewählten Segments
+  const targetAngle = randomSlice * arc + arc / 2;
+
+  const spins = 6; // volle Umdrehungen
+  const targetRotation = spins * 2 * Math.PI + targetAngle;
+
+  const duration = 7000; // Drehdauer in ms
   const start = performance.now();
 
   function animate(time) {
