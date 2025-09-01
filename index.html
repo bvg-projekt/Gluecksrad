@@ -166,32 +166,36 @@ function drawWheel() {
   }
 }
 
-// Spin-Funktion: wählt Segment per Index, Zeiger mittig
 function spinWheel() {
-  const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc / 2;
-  const spins = 6;
-  const targetRotation = spins * 2 * Math.PI + targetAngle;
+  const spins = 6; // Anzahl voller Umdrehungen
+  const randomOffset = Math.random() * 2 * Math.PI; // Zufällige Endposition innerhalb eines Segments
+  const targetRotation = spins * 2 * Math.PI + randomOffset;
   const duration = 7000;
   const start = performance.now();
 
-  function animate(time){
+  function animate(time) {
     let elapsed = time - start;
-    let progress = Math.min(elapsed/duration,1);
-    let eased = 1 - Math.pow(1-progress,3);
-    angle = (-Math.PI/2 + targetRotation*eased) % (2*Math.PI);
+    let progress = Math.min(elapsed / duration, 1);
+    let eased = 1 - Math.pow(1 - progress, 3); // sanftes Auslaufen
+    angle = (-Math.PI/2 + targetRotation * eased) % (2 * Math.PI);
     drawWheel();
-    if(progress<1){
+
+    if(progress < 1) {
       requestAnimationFrame(animate);
     } else {
-      showResult(segments[randomSlice]);
+      // Segment unter dem Zeiger bestimmen
+      const adjustedAngle = (2 * Math.PI + (-angle + Math.PI/2)) % (2 * Math.PI);
+      const segmentIndex = Math.floor(adjustedAngle / arc) % segments.length;
+      showResult(segments[segmentIndex]);
     }
   }
 
   requestAnimationFrame(animate);
 }
 
-function showResult(segment){
+function showResult(segment) {
+  // Popup-Fenster mit Gewinn
+  alert(segment.message);
   document.getElementById('result').innerText = segment.message;
   if(segment.confetti) launchConfetti();
 }
