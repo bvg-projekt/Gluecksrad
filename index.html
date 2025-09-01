@@ -194,7 +194,6 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
-// Segmente
 const segments = [
   { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
   { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
@@ -204,16 +203,15 @@ const segments = [
   { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true }
 ];
 
-
 const arc = 2 * Math.PI / segments.length;
-let angle = -Math.PI/2 + (arc / 2);
+let startAngle = -Math.PI / 2; // Pfeil oben
 
 function drawWheel(){
   ctx.clearRect(0,0,width,height);
   for(let i=0;i<segments.length;i++){
     ctx.beginPath();
     ctx.moveTo(center,center);
-    ctx.arc(center,center,center,angle+i*arc,angle+(i+1)*arc);
+    ctx.arc(center,center,center,startAngle + i*arc,startAngle + (i+1)*arc);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
     ctx.strokeStyle="#ffffff";
@@ -222,21 +220,34 @@ function drawWheel(){
   }
 }
 
+// Spin-Funktion
 function spinWheel(){
+  // Zufälliges Segment auswählen
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc/2;
-  const spins = 6;
+  const targetAngle = (segments.length - randomSlice) * arc; 
+  const spins = 6; 
   const targetRotation = spins*2*Math.PI + targetAngle;
+
   const duration = 7000;
   const start = performance.now();
 
   function animate(time){
-    let elapsed = time-start;
+    let elapsed = time - start;
     let progress = Math.min(elapsed/duration,1);
-    let eased = 1-Math.pow(1-progress,3);
-    angle = (-Math.PI/2 + targetRotation*eased)%(2*Math.PI);
-    drawWheel();
-    if(progress<1){
+    let eased = 1 - Math.pow(1 - progress,3);
+    let angle = startAngle + targetRotation*eased;
+    ctx.clearRect(0,0,width,height);
+    for(let i=0;i<segments.length;i++){
+      ctx.beginPath();
+      ctx.moveTo(center,center);
+      ctx.arc(center,center,center,angle + i*arc, angle + (i+1)*arc);
+      ctx.fillStyle = segments[i].color;
+      ctx.fill();
+      ctx.strokeStyle="#fff";
+      ctx.lineWidth=2;
+      ctx.stroke();
+    }
+    if(progress < 1){
       requestAnimationFrame(animate);
     } else {
       showResult(segments[randomSlice]);
@@ -245,6 +256,7 @@ function spinWheel(){
   requestAnimationFrame(animate);
 }
 
+// Popup
 const popup = document.getElementById('result-popup');
 const popupMessage = document.getElementById('popup-message');
 const closeBtn = document.querySelector('.popup .close-btn');
@@ -264,7 +276,7 @@ closeBtn.onclick = () => {
 }
 confettiBtn.onclick = () => launchConfetti();
 
-// Confetti
+// Konfetti
 function launchConfetti(){
   const confettiCount = 100;
   const confettiElements = [];
@@ -301,13 +313,9 @@ function launchConfetti(){
 
   const duration=3000;
   const start = performance.now();
-
   function animate(time){
-    let elapsed = time-start;
-    if(elapsed>duration){
-      confettiElements.forEach(c=>c.el.remove());
-      return;
-    }
+    let elapsed = time - start;
+    if(elapsed>duration){ confettiElements.forEach(c=>c.el.remove()); return; }
     confettiElements.forEach(c=>{
       c.vy+=c.gravity;
       c.x+=c.vx;
@@ -319,7 +327,6 @@ function launchConfetti(){
     });
     requestAnimationFrame(animate);
   }
-
   requestAnimationFrame(animate);
 }
 
