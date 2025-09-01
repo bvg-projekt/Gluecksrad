@@ -223,10 +223,14 @@ function drawWheel(){
 // Spin-Funktion
 function spinWheel(){
   // Zufälliges Segment auswählen
+function spinWheel(){
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = (segments.length - randomSlice) * arc; 
+
+  // Mittelpunktswinkel des gewählten Segments
+  const targetAngle = startAngle + randomSlice * arc + arc/2;
+
   const spins = 6; 
-  const targetRotation = spins*2*Math.PI + targetAngle;
+  const targetRotation = spins*2*Math.PI + (2*Math.PI - targetAngle); // Drehrichtung korrigieren
 
   const duration = 7000;
   const start = performance.now();
@@ -236,6 +240,7 @@ function spinWheel(){
     let progress = Math.min(elapsed/duration,1);
     let eased = 1 - Math.pow(1 - progress,3);
     let angle = startAngle + targetRotation*eased;
+
     ctx.clearRect(0,0,width,height);
     for(let i=0;i<segments.length;i++){
       ctx.beginPath();
@@ -247,6 +252,7 @@ function spinWheel(){
       ctx.lineWidth=2;
       ctx.stroke();
     }
+
     if(progress < 1){
       requestAnimationFrame(animate);
     } else {
@@ -255,6 +261,7 @@ function spinWheel(){
   }
   requestAnimationFrame(animate);
 }
+
 
 // Popup
 const popup = document.getElementById('result-popup');
