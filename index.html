@@ -139,26 +139,25 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
+// Segment-Zuordnung: Farbe → Gewinn
 const segments = [
   { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
   { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
   { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false },
   { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
-  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
-  { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false }
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true }
 ];
 
 const arc = 2 * Math.PI / segments.length;
-
-// Startwinkel: erstes Segment unter dem Pfeil
-let angle = -Math.PI / 2;
+let angle = -Math.PI / 2; // Startwinkel so, dass erstes Segment unter dem Pfeil liegt
 
 function drawWheel() {
   ctx.clearRect(0, 0, width, height);
-  for(let i=0; i<segments.length; i++){
+  for (let i = 0; i < segments.length; i++) {
     ctx.beginPath();
     ctx.moveTo(center, center);
-    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
+    ctx.arc(center, center, center, angle + i * arc, angle + (i + 1) * arc);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
     ctx.strokeStyle = "#ffffff";
@@ -169,9 +168,7 @@ function drawWheel() {
 
 function spinWheel() {
   const randomSlice = Math.floor(Math.random() * segments.length);
-  
-  // Zielwinkel so berechnen, dass der Zeiger in der Mitte des Segments landet
-  const targetAngle = Math.PI/2 - (randomSlice + 0.5) * arc;
+  const targetAngle = randomSlice * arc + arc / 2;
 
   const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
@@ -183,7 +180,7 @@ function spinWheel() {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
     let eased = 1 - Math.pow(1 - progress, 3);
-    angle = targetRotation * eased % (2 * Math.PI);
+    angle = (-Math.PI/2 + targetRotation * eased) % (2 * Math.PI);
     drawWheel();
 
     if(progress < 1) {
@@ -270,5 +267,6 @@ window.addEventListener('resize', () => {
   drawWheel();
 });
 </script>
+
 </body>
 </html>
