@@ -140,23 +140,25 @@ let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
 const segments = [
-  { color: '#efd729', message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti: true },
-  { color: '#ccc', message: "Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti: true },
-  { color: '#fff', message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti: true },
-  { color: '#888', message: "Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti: false },
-  { color: '#ccc', message: "Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti: true },
-  { color: '#fff', message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti: true }
+  { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true }
 ];
 
 const arc = 2 * Math.PI / segments.length;
+
+// Startwinkel: erstes Segment unter dem Pfeil
 let angle = -Math.PI / 2;
 
 function drawWheel() {
   ctx.clearRect(0, 0, width, height);
-  for (let i = 0; i < segments.length; i++) {
+  for(let i=0; i<segments.length; i++){
     ctx.beginPath();
     ctx.moveTo(center, center);
-    ctx.arc(center, center, center, angle + i * arc, angle + (i + 1) * arc);
+    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
     ctx.strokeStyle = "#ffffff";
@@ -167,7 +169,9 @@ function drawWheel() {
 
 function spinWheel() {
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc / 2;
+  
+  // Zielwinkel so berechnen, dass der Zeiger in der Mitte des Segments landet
+  const targetAngle = Math.PI/2 - (randomSlice + 0.5) * arc;
 
   const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
@@ -179,10 +183,10 @@ function spinWheel() {
     let elapsed = time - start;
     let progress = Math.min(elapsed / duration, 1);
     let eased = 1 - Math.pow(1 - progress, 3);
-    angle = (-Math.PI / 2 + targetRotation * eased) % (2 * Math.PI);
+    angle = targetRotation * eased % (2 * Math.PI);
     drawWheel();
 
-    if (progress < 1) {
+    if(progress < 1) {
       requestAnimationFrame(animate);
     } else {
       showResult(segments[randomSlice]);
@@ -192,51 +196,51 @@ function spinWheel() {
   requestAnimationFrame(animate);
 }
 
-function showResult(segment) {
+function showResult(segment){
   document.getElementById('result').innerText = segment.message;
-  if (segment.confetti) launchConfetti();
+  if(segment.confetti) launchConfetti();
 }
 
-function launchConfetti() {
+function launchConfetti(){
   const confettiCount = 100;
   const confettiElements = [];
-  const colors = ['#efd729', '#ccc', '#fff', '#888'];
+  const colors = ['#efd729','#ccc','#fff','#888'];
   const container = document.querySelector('.wheel-container');
-  const centerX = container.offsetLeft + container.offsetWidth / 2;
-  const centerY = container.offsetTop + container.offsetHeight / 2;
+  const centerX = container.offsetLeft + container.offsetWidth/2;
+  const centerY = container.offsetTop + container.offsetHeight/2;
 
-  for (let i = 0; i < confettiCount; i++) {
+  for(let i=0; i<confettiCount; i++){
     const confetti = document.createElement('div');
     confetti.style.position = 'absolute';
-    confetti.style.width = confetti.style.height = Math.random() * 8 + 4 + 'px';
-    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = confetti.style.height = Math.random()*8 + 4 + 'px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
     confetti.style.left = centerX + 'px';
     confetti.style.top = centerY + 'px';
     confetti.style.opacity = Math.random() * 0.9 + 0.1;
     confetti.style.borderRadius = '50%';
-    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+    confetti.style.transform = `rotate(${Math.random()*360}deg)`;
     document.body.appendChild(confetti);
 
     const angle = Math.random() * 2 * Math.PI;
-    const speed = Math.random() * 6 + 4;
+    const speed = Math.random()*6 + 4;
     confettiElements.push({
       el: confetti,
       x: centerX,
       y: centerY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      rotation: Math.random() * 360,
-      rotationSpeed: (Math.random() - 0.5) * 10,
-      gravity: 0.2 + Math.random() * 0.1
+      rotation: Math.random()*360,
+      rotationSpeed: (Math.random()-0.5)*10,
+      gravity: 0.2 + Math.random()*0.1
     });
   }
 
   const duration = 3000;
   const start = performance.now();
 
-  function animate(time) {
+  function animate(time){
     let elapsed = time - start;
-    if (elapsed > duration) {
+    if(elapsed > duration){
       confettiElements.forEach(c => c.el.remove());
       return;
     }
@@ -266,3 +270,5 @@ window.addEventListener('resize', () => {
   drawWheel();
 });
 </script>
+</body>
+</html>
