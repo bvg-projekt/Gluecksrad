@@ -203,10 +203,10 @@ let startAngle = -Math.PI/2;
 function drawWheel(rotation=0){
   ctx.clearRect(0,0,width,height);
 
-  // Radschatten (für Gesamtabhebung)
+  // Gesamtes Rad leicht schattieren
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.2)";
-  ctx.shadowBlur = 20;
+  ctx.shadowColor = "rgba(0,0,0,0.2)"; // dezenter Schatten
+  ctx.shadowBlur = 15;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
@@ -216,24 +216,13 @@ function drawWheel(rotation=0){
     ctx.arc(center,center,center,startAngle + i*arc + rotation,startAngle + (i+1)*arc + rotation);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
-    ctx.strokeStyle="#fff";       // Segmenttrennung
-    ctx.lineWidth=3;
+    ctx.strokeStyle="#fff";  // weiße Trennlinien
+    ctx.lineWidth=2;
     ctx.stroke();
   }
 
-  ctx.restore(); // Schatten zurücksetzen
-
-  // Optional: kleine Kontur innerhalb der Segmente für 3D-Optik
-  for(let i=0;i<segments.length;i++){
-    ctx.beginPath();
-    ctx.moveTo(center,center);
-    ctx.arc(center,center,center-5,startAngle + i*arc + rotation,startAngle + (i+1)*arc + rotation);
-    ctx.strokeStyle="rgba(0,0,0,0.05)";
-    ctx.lineWidth=5;
-    ctx.stroke();
-  }
+  ctx.restore(); // Schatten nur für die Scheibe
 }
-
 
 
 // Popup & Buttons
