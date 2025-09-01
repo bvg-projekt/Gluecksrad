@@ -161,7 +161,7 @@ function drawWheel() {
     ctx.beginPath();
     ctx.moveTo(center, center);
     ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
-ctx.fillStyle = segments[i].color; // exakt deine Vorgaben
+ctx.fillStyle = shadeColor(segments[i].color, 0);
 ctx.fill();
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
