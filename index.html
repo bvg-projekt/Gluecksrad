@@ -84,14 +84,6 @@
     background-color: #e6cd24;
   }
 
-  .result {
-    text-align: center;
-    font-size: 16px;
-    max-width: 400px;
-    line-height: 1.4;
-    margin-bottom: 20px;
-  }
-
   .links {
     text-align: center;
     font-size: 16px;
@@ -105,6 +97,34 @@
     text-decoration: none;
     color: #0055a5;
     font-weight: bold;
+  }
+
+  /* Popup */
+  .popup {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  .popup-content {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    font-size: 18px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .popup .close {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 22px;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -123,13 +143,20 @@
 </div>
 
 <button class="spin-button" id="spin">JETZT DREHEN</button>
-<div class="result" id="result">Verfügbar: 1/1 Dreh heute</div>
 
 <div class="links">
   <p>Lassen Sie uns in Kontakt bleiben:</p>
   <a href="https://bvg-projekt.de/" target="_blank">Website</a> |
   <a href="https://de.linkedin.com/company/bvg-projekt-gmbh" target="_blank">LinkedIn</a> |
   <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">YouTube</a>
+</div>
+
+<!-- Popup -->
+<div id="result-popup" class="popup">
+  <div class="popup-content">
+    <span class="close">&times;</span>
+    <p id="popup-message"></p>
+  </div>
 </div>
 
 <script>
@@ -139,18 +166,18 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
-// Segmente in korrekter Reihenfolge mit richtiger Farbe und Gewinn
+// Segmente: Farbe exakt passend zu Gewinn
 const segments = [
-  {color:'#efd729', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true}, // Hauptgewinn
-  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
-  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}, // Kleiner Gewinn
-  {color:'#888', message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false}, // Niete
-  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
-  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true} // Kleiner Gewinn
+  {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
+  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
+  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
+  {color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false},
+  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
+  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let angle = -Math.PI / 2; // Startwinkel
+let angle = -Math.PI/2; // Startwinkel unter dem Pfeil
 
 function drawWheel() {
   ctx.clearRect(0, 0, width, height);
@@ -167,39 +194,42 @@ function drawWheel() {
 }
 
 function spinWheel() {
-  const spins = 6; // Anzahl voller Umdrehungen
-  const randomOffset = Math.random() * 2 * Math.PI; // Zufällige Endposition innerhalb eines Segments
-  const targetRotation = spins * 2 * Math.PI + randomOffset;
+  const randomSlice = Math.floor(Math.random() * segments.length);
+  const targetAngle = randomSlice * arc + arc / 2;
+  const spins = 6;
+  const targetRotation = spins * 2 * Math.PI + targetAngle;
   const duration = 7000;
   const start = performance.now();
 
-  function animate(time) {
+  function animate(time){
     let elapsed = time - start;
-    let progress = Math.min(elapsed / duration, 1);
-    let eased = 1 - Math.pow(1 - progress, 3); // sanftes Auslaufen
-    angle = (-Math.PI/2 + targetRotation * eased) % (2 * Math.PI);
+    let progress = Math.min(elapsed/duration,1);
+    let eased = 1 - Math.pow(1-progress,3);
+    angle = (-Math.PI/2 + targetRotation*eased) % (2*Math.PI);
     drawWheel();
-
-    if(progress < 1) {
+    if(progress<1){
       requestAnimationFrame(animate);
     } else {
-      // Segment unter dem Zeiger bestimmen
-      const adjustedAngle = (2 * Math.PI + (-angle + Math.PI/2)) % (2 * Math.PI);
-      const segmentIndex = Math.floor(adjustedAngle / arc) % segments.length;
-      showResult(segments[segmentIndex]);
+      showResult(segments[randomSlice]);
     }
   }
-
   requestAnimationFrame(animate);
 }
 
-function showResult(segment) {
-  // Popup-Fenster mit Gewinn
-  alert(segment.message);
-  document.getElementById('result').innerText = segment.message;
+// Professionelles Popup
+function showResult(segment){
+  const popup = document.getElementById('result-popup');
+  document.getElementById('popup-message').innerText = segment.message;
+  popup.style.display = 'flex';
   if(segment.confetti) launchConfetti();
 }
 
+// Popup schließen
+document.querySelector('.popup .close').onclick = () => {
+  document.getElementById('result-popup').style.display = 'none';
+}
+
+// Confetti
 function launchConfetti(){
   const confettiCount = 100;
   const confettiElements = [];
@@ -220,31 +250,34 @@ function launchConfetti(){
     confetti.style.transform=`rotate(${Math.random()*360}deg)`;
     document.body.appendChild(confetti);
 
-    const angle = Math.random()*2*Math.PI;
-    const speed = Math.random()*6+4;
+    const angle=Math.random()*2*Math.PI;
+    const speed=Math.random()*6+4;
     confettiElements.push({
-      el: confetti,
-      x: centerX,
-      y: centerY,
-      vx: Math.cos(angle)*speed,
-      vy: Math.sin(angle)*speed,
-      rotation: Math.random()*360,
-      rotationSpeed: (Math.random()-0.5)*10,
-      gravity: 0.2 + Math.random()*0.1
+      el:confetti,
+      x:centerX,
+      y:centerY,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      rotation:Math.random()*360,
+      rotationSpeed:(Math.random()-0.5)*10,
+      gravity:0.2+Math.random()*0.1
     });
   }
 
-  const duration = 3000;
+  const duration=3000;
   const start = performance.now();
 
   function animate(time){
     let elapsed = time - start;
-    if(elapsed>duration){ confettiElements.forEach(c=>c.el.remove()); return; }
+    if(elapsed>duration){
+      confettiElements.forEach(c=>c.el.remove());
+      return;
+    }
     confettiElements.forEach(c=>{
-      c.vy += c.gravity;
-      c.x += c.vx;
-      c.y += c.vy;
-      c.rotation += c.rotationSpeed;
+      c.vy+=c.gravity;
+      c.x+=c.vx;
+      c.y+=c.vy;
+      c.rotation+=c.rotationSpeed;
       c.el.style.top=c.y+'px';
       c.el.style.left=c.x+'px';
       c.el.style.transform=`rotate(${c.rotation}deg)`;
@@ -258,11 +291,12 @@ function launchConfetti(){
 drawWheel();
 document.getElementById('spin').addEventListener('click', spinWheel);
 
-window.addEventListener('resize',()=>{
-  width=canvas.width=canvas.offsetWidth;
-  height=canvas.height=canvas.offsetWidth;
+window.addEventListener('resize', ()=>{
+  width = canvas.width = canvas.offsetWidth;
+  height = canvas.height = canvas.offsetWidth;
   drawWheel();
 });
 </script>
+
 </body>
 </html>
