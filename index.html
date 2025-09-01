@@ -33,7 +33,6 @@
     display: block;
   }
 
-  /* Logo mit Kreis-Hintergrund */
   .logo-container {
     position: absolute;
     top: 50%;
@@ -58,12 +57,11 @@
     pointer-events: none;
   }
 
-  /* Pfeil über dem Rad */
   .pointer {
     position: absolute;
     top: -30px;
     left: 50%;
-    transform: translateX(-50%) rotate(180deg); /* Pfeil nach unten */
+    transform: translateX(-50%) rotate(180deg);
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
@@ -144,15 +142,13 @@ const center = width / 2;
 const segments = [
   {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
   {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
-  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
   {color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false},
   {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
+  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
   {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}
 ];
 
 const arc = 2 * Math.PI / segments.length;
-
-// Startwinkel so, dass erstes Segment unter dem Pfeil liegt
 let angle = -Math.PI / 2;
 
 function drawWheel() {
@@ -161,8 +157,8 @@ function drawWheel() {
     ctx.beginPath();
     ctx.moveTo(center, center);
     ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
-ctx.fillStyle = shadeColor(segments[i].color, 0);
-ctx.fill();
+    ctx.fillStyle = segments[i].color;
+    ctx.fill();
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -171,8 +167,7 @@ ctx.fill();
 
 function spinWheel() {
   const randomSlice = Math.floor(Math.random() * segments.length);
-const targetAngle = randomSlice * arc + arc / 2; // neue Zeile
-
+  const targetAngle = randomSlice * arc + arc / 2;
 
   const spins = 6;
   const targetRotation = spins * 2 * Math.PI + targetAngle;
@@ -243,34 +238,3 @@ function launchConfetti(){
     let elapsed = time - start;
     if(elapsed > duration){
       confettiElements.forEach(c => c.el.remove());
-      return;
-    }
-
-    confettiElements.forEach(c => {
-      c.vy += c.gravity;
-      c.x += c.vx;
-      c.y += c.vy;
-      c.rotation += c.rotationSpeed;
-      c.el.style.top = c.y + 'px';
-      c.el.style.left = c.x + 'px';
-      c.el.style.transform = `rotate(${c.rotation}deg)`;
-    });
-
-    requestAnimationFrame(animate);
-  }
-
-  requestAnimationFrame(animate);
-}
-
-drawWheel();
-document.getElementById('spin').addEventListener('click', spinWheel);
-
-window.addEventListener('resize', () => {
-  width = canvas.width = canvas.offsetWidth;
-  height = canvas.height = canvas.offsetWidth;
-  drawWheel();
-});
-</script>
-
-</body>
-</html>
