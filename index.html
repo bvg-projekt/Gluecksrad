@@ -109,7 +109,14 @@
     justify-content: center;
     align-items: center;
     z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
+  .popup.show {
+    display: flex;
+    opacity: 1;
+  }
+
   .popup-content {
     background: #fff;
     padding: 30px 40px;
@@ -119,12 +126,32 @@
     font-size: 18px;
     box-shadow: 0 0 20px rgba(0,0,0,0.3);
     position: relative;
+    transition: transform 0.3s ease;
   }
-  .popup .close {
-    position: absolute;
-    top: 10px; right: 15px;
-    font-size: 22px;
+  .popup.show .popup-content {
+    transform: scale(1);
+  }
+
+  .popup .close-btn, .popup .confetti-btn {
     cursor: pointer;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px 0 5px;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  .popup .close-btn {
+    background-color: #ddd;
+  }
+  .popup .close-btn:hover {
+    background-color: #ccc;
+  }
+  .popup .confetti-btn {
+    background-color: #efd729;
+  }
+  .popup .confetti-btn:hover {
+    background-color: #e6cd24;
   }
 </style>
 </head>
@@ -154,8 +181,9 @@
 <!-- Popup -->
 <div id="result-popup" class="popup">
   <div class="popup-content">
-    <span class="close">&times;</span>
     <p id="popup-message"></p>
+    <button class="close-btn">Schließen</button>
+    <button class="confetti-btn">Mehr Konfetti 🎉</button>
   </div>
 </div>
 
@@ -166,7 +194,7 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
-// Segmente: Farbe exakt passend zu Gewinn
+// Segmente
 const segments = [
   {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
   {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
@@ -177,35 +205,35 @@ const segments = [
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let angle = -Math.PI/2; // Startwinkel unter dem Pfeil
+let angle = -Math.PI/2;
 
-function drawWheel() {
-  ctx.clearRect(0, 0, width, height);
-  for(let i=0; i<segments.length; i++){
+function drawWheel(){
+  ctx.clearRect(0,0,width,height);
+  for(let i=0;i<segments.length;i++){
     ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
+    ctx.moveTo(center,center);
+    ctx.arc(center,center,center,angle+i*arc,angle+(i+1)*arc);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle="#ffffff";
+    ctx.lineWidth=2;
     ctx.stroke();
   }
 }
 
-function spinWheel() {
+function spinWheel(){
   const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc / 2;
+  const targetAngle = randomSlice * arc + arc/2;
   const spins = 6;
-  const targetRotation = spins * 2 * Math.PI + targetAngle;
+  const targetRotation = spins*2*Math.PI + targetAngle;
   const duration = 7000;
   const start = performance.now();
 
   function animate(time){
-    let elapsed = time - start;
+    let elapsed = time-start;
     let progress = Math.min(elapsed/duration,1);
-    let eased = 1 - Math.pow(1-progress,3);
-    angle = (-Math.PI/2 + targetRotation*eased) % (2*Math.PI);
+    let eased = 1-Math.pow(1-progress,3);
+    angle = (-Math.PI/2 + targetRotation*eased)%(2*Math.PI);
     drawWheel();
     if(progress<1){
       requestAnimationFrame(animate);
@@ -216,18 +244,24 @@ function spinWheel() {
   requestAnimationFrame(animate);
 }
 
-// Professionelles Popup
+const popup = document.getElementById('result-popup');
+const popupMessage = document.getElementById('popup-message');
+const closeBtn = document.querySelector('.popup .close-btn');
+const confettiBtn = document.querySelector('.popup .confetti-btn');
+
 function showResult(segment){
-  const popup = document.getElementById('result-popup');
-  document.getElementById('popup-message').innerText = segment.message;
-  popup.style.display = 'flex';
+  popupMessage.innerText = segment.message;
+  popup.style.display='flex';
+  setTimeout(()=>popup.classList.add('show'),10);
   if(segment.confetti) launchConfetti();
 }
 
-// Popup schließen
-document.querySelector('.popup .close').onclick = () => {
-  document.getElementById('result-popup').style.display = 'none';
+// Buttons
+closeBtn.onclick = () => {
+  popup.classList.remove('show');
+  setTimeout(()=>popup.style.display='none',300);
 }
+confettiBtn.onclick = () => launchConfetti();
 
 // Confetti
 function launchConfetti(){
@@ -268,7 +302,7 @@ function launchConfetti(){
   const start = performance.now();
 
   function animate(time){
-    let elapsed = time - start;
+    let elapsed = time-start;
     if(elapsed>duration){
       confettiElements.forEach(c=>c.el.remove());
       return;
@@ -297,6 +331,5 @@ window.addEventListener('resize', ()=>{
   drawWheel();
 });
 </script>
-
 </body>
 </html>
