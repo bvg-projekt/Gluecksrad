@@ -24,7 +24,7 @@
     position: relative;
     width: 90vw;
     max-width: 500px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   canvas {
@@ -80,12 +80,14 @@
     transition: background 0.3s;
     margin-bottom: 20px;
   }
-  .spin-button:hover {
-    background-color: #e6cd24;
-  }
-  .spin-button.disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  .spin-button:hover { background-color: #e6cd24; }
+  .spin-button.disabled { background-color: #ccc; cursor: not-allowed; }
+
+  #daily-msg {
+    font-size: 12px;
+    color: #888;
+    margin: 8px 0;
+    text-align: center;
   }
 
   .links {
@@ -103,14 +105,6 @@
     font-weight: bold;
   }
 
-  .daily-msg {
-    font-size: 16px;
-    font-weight: bold;
-    color: #d00;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
   /* Popup */
   .popup {
     display: none;
@@ -124,10 +118,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  .popup.show {
-    display: flex;
-    opacity: 1;
-  }
+  .popup.show { display: flex; opacity: 1; }
 
   .popup-content {
     background: #fff;
@@ -140,9 +131,7 @@
     position: relative;
     transition: transform 0.3s ease;
   }
-  .popup.show .popup-content {
-    transform: scale(1);
-  }
+  .popup.show .popup-content { transform: scale(1); }
 
   .popup .close-btn, .popup .confetti-btn {
     cursor: pointer;
@@ -153,18 +142,10 @@
     font-size: 16px;
     transition: background 0.3s;
   }
-  .popup .close-btn {
-    background-color: #ddd;
-  }
-  .popup .close-btn:hover {
-    background-color: #ccc;
-  }
-  .popup .confetti-btn {
-    background-color: #efd729;
-  }
-  .popup .confetti-btn:hover {
-    background-color: #e6cd24;
-  }
+  .popup .close-btn { background-color: #ddd; }
+  .popup .close-btn:hover { background-color: #ccc; }
+  .popup .confetti-btn { background-color: #efd729; }
+  .popup .confetti-btn:hover { background-color: #e6cd24; }
 </style>
 </head>
 <body>
@@ -172,8 +153,6 @@
 <header>
   <h1>Kurbelt unseren Planeten wieder an mit dem <strong>BVG Projekt GmbH</strong> Glücksrad!</h1>
 </header>
-
-<div class="daily-msg" id="daily-msg"></div>
 
 <div class="wheel-container">
   <canvas id="wheel"></canvas>
@@ -183,6 +162,7 @@
   <div class="pointer"></div>
 </div>
 
+<p id="daily-msg"></p>
 <button class="spin-button" id="spin">JETZT DREHEN</button>
 
 <div class="links">
@@ -205,46 +185,54 @@ const canvas = document.getElementById('wheel');
 const ctx = canvas.getContext('2d');
 let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
-const center = width / 2;
+const center = width/2;
 
+// Segmente: Gelb, Weiß, Dunkelgrau, Hellgrau, Weiß, Hellgrau
 const segments = [
-  { color:'#efd729', text:"Hauptgewinn", message:"„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
-  { color:'#fff', text:"Kleiner Gewinn", message:"„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
   { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false },
-  { color:'#fff', text:"Kleiner Gewinn", message:"„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true }
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true }
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let startAngle = -Math.PI / 2;
+let startAngle = -Math.PI/2;
 
-function drawWheel(rotation = 0){
+// Zeichne Rad
+function drawWheel(rotation=0){
   ctx.clearRect(0,0,width,height);
   for(let i=0;i<segments.length;i++){
     ctx.beginPath();
     ctx.moveTo(center,center);
-    ctx.arc(center,center,center,startAngle + i*arc + rotation, startAngle + (i+1)*arc + rotation);
+    ctx.arc(center,center,center,startAngle + i*arc + rotation,startAngle + (i+1)*arc + rotation);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
-    ctx.strokeStyle="#ffffff";
+    ctx.strokeStyle="#fff";
     ctx.lineWidth=2;
     ctx.stroke();
   }
 }
 
-// Prüfen, ob heute schon gedreht wurde
+// Popup & Buttons
+const popup = document.getElementById('result-popup');
+const popupMessage = document.getElementById('popup-message');
+const closeBtn = document.querySelector('.popup .close-btn');
+const confettiBtn = document.querySelector('.popup .confetti-btn');
 const spinBtn = document.getElementById('spin');
 const dailyMsg = document.getElementById('daily-msg');
 const todayKey = 'wheel-spun-date';
 const today = new Date().toLocaleDateString();
 
+// Prüfen, ob heute schon gedreht wurde
 if(localStorage.getItem(todayKey) === today){
   spinBtn.classList.add('disabled');
   spinBtn.disabled = true;
-  dailyMsg.textContent = "Heute schon gedreht – probiere es morgen noch einmal!";
+  dailyMsg.textContent = "Heute schon gedreht – morgen wieder!";
 }
 
+// Spin-Funktion
 function spinWheel(){
   if(spinBtn.disabled) return;
 
@@ -257,35 +245,26 @@ function spinWheel(){
   function animate(time){
     const elapsed = time - start;
     const progress = Math.min(elapsed/duration,1);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    const eased = 1 - Math.pow(1 - progress,3);
     const rotation = targetRotation * eased;
     drawWheel(rotation);
-    if(progress < 1){
+    if(progress<1){
       requestAnimationFrame(animate);
     } else {
       showResult(segments[randomIndex]);
-      // Nach Drehung: Button deaktivieren
       spinBtn.classList.add('disabled');
       spinBtn.disabled = true;
       dailyMsg.textContent = "Heute schon gedreht – morgen wieder!";
-      localStorage.setItem(todayKey, today);
+      localStorage.setItem(todayKey,today);
     }
   }
   requestAnimationFrame(animate);
 }
 
-// Popup & Buttons
-const popup = document.getElementById('result-popup');
-const popupMessage = document.getElementById('popup-message');
-const closeBtn = document.querySelector('.popup .close-btn');
-const confettiBtn = document.querySelector('.popup .confetti-btn');
-
+// Ergebnis Popup
 function showResult(segment){
-  if(segment.text !== "Niete"){
-    popupMessage.innerHTML = `<strong>Herzlichen Glückwunsch, Sie haben gewonnen.</strong><br><br>${segment.message}`;
-  } else {
-    popupMessage.innerHTML = segment.message;
-  }
+  const lines = segment.message.split('\n');
+  popupMessage.innerHTML = `<strong>${lines[0]}</strong><br><br>${lines[1] || ''}`;
   popup.style.display='flex';
   setTimeout(()=>popup.classList.add('show'),10);
   if(segment.confetti) launchConfetti();
@@ -296,15 +275,15 @@ confettiBtn.onclick = () => launchConfetti();
 
 // Konfetti
 function launchConfetti(){
-  const confettiCount = 100;
-  const confettiElements = [];
-  const colors = ['#efd729','#ccc','#fff','#888'];
-  const container = document.querySelector('.wheel-container');
+  const confettiCount=100;
+  const confettiElements=[];
+  const colors=['#efd729','#ccc','#fff','#888'];
+  const container=document.querySelector('.wheel-container');
   const centerX = container.offsetLeft + container.offsetWidth/2;
   const centerY = container.offsetTop + container.offsetHeight/2;
 
   for(let i=0;i<confettiCount;i++){
-    const confetti = document.createElement('div');
+    const confetti=document.createElement('div');
     confetti.style.position='absolute';
     confetti.style.width=confetti.style.height=Math.random()*8+4+'px';
     confetti.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
@@ -317,22 +296,13 @@ function launchConfetti(){
 
     const angle=Math.random()*2*Math.PI;
     const speed=Math.random()*6+4;
-    confettiElements.push({
-      el:confetti,
-      x:centerX,
-      y:centerY,
-      vx:Math.cos(angle)*speed,
-      vy:Math.sin(angle)*speed,
-      rotation:Math.random()*360,
-      rotationSpeed:(Math.random()-0.5)*10,
-      gravity:0.2+Math.random()*0.1
-    });
+    confettiElements.push({el:confetti,x:centerX,y:centerY,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,rotation:Math.random()*360,rotationSpeed:(Math.random()-0.5)*10,gravity:0.2+Math.random()*0.1});
   }
 
   const duration=3000;
   const start = performance.now();
   function animate(time){
-    let elapsed = time-start;
+    const elapsed=time-start;
     if(elapsed>duration){ confettiElements.forEach(c=>c.el.remove()); return; }
     confettiElements.forEach(c=>{
       c.vy+=c.gravity;
@@ -349,7 +319,7 @@ function launchConfetti(){
 }
 
 drawWheel();
-spinBtn.addEventListener('click', spinWheel);
+document.getElementById('spin').addEventListener('click', spinWheel);
 
 window.addEventListener('resize', ()=>{
   width = canvas.width = canvas.offsetWidth;
