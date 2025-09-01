@@ -195,12 +195,12 @@ let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
 const segments = [
-  { color:'#efd729', text:"Hauptgewinn", message:"Hauptgewinn!", confetti:true },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"Mittlerer Gewinn!", confetti:true },
-  { color:'#fff', text:"Kleiner Gewinn", message:"Kleiner Gewinn!", confetti:true },
-  { color:'#888', text:"Niete", message:"Niete", confetti:false },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"Mittlerer Gewinn!", confetti:true },
-  { color:'#fff', text:"Kleiner Gewinn", message:"Kleiner Gewinn!", confetti:true }
+  {color:'#efd729', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true}, // Hauptgewinn
+  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
+  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}, // Kleiner Gewinn
+  {color:'#888', message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false}, // Niete
+  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
+  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true} // Kleiner Gewinn
 ];
 
 const arc = 2 * Math.PI / segments.length;
