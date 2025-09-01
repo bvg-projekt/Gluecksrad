@@ -200,9 +200,16 @@ const segments = [
 const arc = 2 * Math.PI / segments.length;
 let startAngle = -Math.PI/2;
 
-// Zeichne Rad
+// Zeichne Rad mit leichtem Schatten für 3D-Effekt
 function drawWheel(rotation=0){
   ctx.clearRect(0,0,width,height);
+
+  // Dezenter Schatten
+  ctx.shadowColor = "rgba(0,0,0,0.2)";
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 4;
+
   for(let i=0;i<segments.length;i++){
     ctx.beginPath();
     ctx.moveTo(center,center);
@@ -213,7 +220,11 @@ function drawWheel(rotation=0){
     ctx.lineWidth=2;
     ctx.stroke();
   }
+
+  // Schatten zurücksetzen, damit andere Elemente (Logo etc.) keinen Schatten bekommen
+  ctx.shadowColor = "transparent";
 }
+
 
 // Popup & Buttons
 const popup = document.getElementById('result-popup');
