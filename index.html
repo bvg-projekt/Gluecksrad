@@ -83,6 +83,10 @@
   .spin-button:hover {
     background-color: #e6cd24;
   }
+  .spin-button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 
   .links {
     text-align: center;
@@ -97,6 +101,14 @@
     text-decoration: none;
     color: #0055a5;
     font-weight: bold;
+  }
+
+  .daily-msg {
+    font-size: 16px;
+    font-weight: bold;
+    color: #d00;
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   /* Popup */
@@ -161,6 +173,8 @@
   <h1>Kurbelt unseren Planeten wieder an mit dem <strong>BVG Projekt GmbH</strong> Glücksrad!</h1>
 </header>
 
+<div class="daily-msg" id="daily-msg"></div>
+
 <div class="wheel-container">
   <canvas id="wheel"></canvas>
   <div class="logo-container">
@@ -193,18 +207,17 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
-// Segmente: Gelb, Hellgrau, Hellgrau, Weiß, Weiß, Dunkelgrau
-  const segments = [
-  { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
-  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+const segments = [
+  { color:'#efd729', text:"Hauptgewinn", message:"„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
   { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false },
-  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
-  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true }
+  { color:'#fff', text:"Kleiner Gewinn", message:"„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true }
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let startAngle = -Math.PI / 2; // Pfeil oben
+let startAngle = -Math.PI / 2;
 
 function drawWheel(rotation = 0){
   ctx.clearRect(0,0,width,height);
@@ -220,12 +233,24 @@ function drawWheel(rotation = 0){
   }
 }
 
-// Spin-Funktion
+// Prüfen, ob heute schon gedreht wurde
+const spinBtn = document.getElementById('spin');
+const dailyMsg = document.getElementById('daily-msg');
+const todayKey = 'wheel-spun-date';
+const today = new Date().toLocaleDateString();
+
+if(localStorage.getItem(todayKey) === today){
+  spinBtn.classList.add('disabled');
+  spinBtn.disabled = true;
+  dailyMsg.textContent = "Heute schon gedreht – probiere es morgen noch einmal!";
+}
+
 function spinWheel(){
+  if(spinBtn.disabled) return;
+
   const randomIndex = Math.floor(Math.random()*segments.length);
   const spins = 6;
   const targetRotation = spins*2*Math.PI + (2*Math.PI - (randomIndex*arc + arc/2));
-
   const duration = 7000;
   const start = performance.now();
 
@@ -239,6 +264,11 @@ function spinWheel(){
       requestAnimationFrame(animate);
     } else {
       showResult(segments[randomIndex]);
+      // Nach Drehung: Button deaktivieren
+      spinBtn.classList.add('disabled');
+      spinBtn.disabled = true;
+      dailyMsg.textContent = "Heute schon gedreht – morgen wieder!";
+      localStorage.setItem(todayKey, today);
     }
   }
   requestAnimationFrame(animate);
@@ -251,7 +281,11 @@ const closeBtn = document.querySelector('.popup .close-btn');
 const confettiBtn = document.querySelector('.popup .confetti-btn');
 
 function showResult(segment){
-  popupMessage.innerText = segment.message;
+  if(segment.text !== "Niete"){
+    popupMessage.innerHTML = `<strong>Herzlichen Glückwunsch, Sie haben gewonnen.</strong><br><br>${segment.message}`;
+  } else {
+    popupMessage.innerHTML = segment.message;
+  }
   popup.style.display='flex';
   setTimeout(()=>popup.classList.add('show'),10);
   if(segment.confetti) launchConfetti();
@@ -315,7 +349,7 @@ function launchConfetti(){
 }
 
 drawWheel();
-document.getElementById('spin').addEventListener('click', spinWheel);
+spinBtn.addEventListener('click', spinWheel);
 
 window.addEventListener('resize', ()=>{
   width = canvas.width = canvas.offsetWidth;
