@@ -200,28 +200,32 @@ const segments = [
 const arc = 2 * Math.PI / segments.length;
 let startAngle = -Math.PI/2;
 
-function drawWheel(rotation=0){
-  ctx.clearRect(0,0,width,height);
+function drawWheel(rotation = 0) {
+  ctx.clearRect(0, 0, width, height);
 
-  // Gesamtes Rad leicht schattieren
+  // Schattenkreis hinter dem Rad
   ctx.save();
+  ctx.beginPath();
+  ctx.arc(center, center, center, 0, 2 * Math.PI);
+  ctx.fillStyle = '#fff'; // Farbe spielt keine Rolle, nur für Schatten
   ctx.shadowColor = "rgba(0,0,0,0.2)"; // dezenter Schatten
-  ctx.shadowBlur = 15;
+  ctx.shadowBlur = 20;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
+  ctx.fill();
+  ctx.restore();
 
-  for(let i=0;i<segments.length;i++){
+  // Segmente zeichnen (ohne Schatten)
+  for (let i = 0; i < segments.length; i++) {
     ctx.beginPath();
-    ctx.moveTo(center,center);
-    ctx.arc(center,center,center,startAngle + i*arc + rotation,startAngle + (i+1)*arc + rotation);
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, center, startAngle + i * arc + rotation, startAngle + (i + 1) * arc + rotation);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
-    ctx.strokeStyle="#fff";  // weiße Trennlinien
-    ctx.lineWidth=2;
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
     ctx.stroke();
   }
-
-  ctx.restore(); // Schatten nur für die Scheibe
 }
 
 
