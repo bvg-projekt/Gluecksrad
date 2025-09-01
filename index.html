@@ -133,108 +133,145 @@
 </div>
 
 <script>
-const canvas = document.getElementById('wheel');
-const ctx = canvas.getContext('2d');
-let width = canvas.width = canvas.offsetWidth;
-let height = canvas.height = canvas.offsetWidth;
-const center = width / 2;
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = canvas.offsetWidth;
+  let height = canvas.height = canvas.offsetWidth;
+  const center = width / 2;
 
-const segments = [
-  {color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true},
-  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
-  {color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false},
-  {color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true},
-  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true},
-  {color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}
-];
+  const segments = [
+    { color: '#efd729', text: "Hauptgewinn", message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti: true },
+    { color: '#ccc', text: "Mittlerer Gewinn", message: "Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti: true },
+    { color: '#fff', text: "Kleiner Gewinn", message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti: true },
+    { color: '#888', text: "Niete", message: "Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti: false },
+    { color: '#ccc', text: "Mittlerer Gewinn", message: "Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti: true },
+    { color: '#fff', text: "Kleiner Gewinn", message: "Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti: true }
+  ];
 
-const arc = 2 * Math.PI / segments.length;
-let angle = -Math.PI / 2;
+  const arc = 2 * Math.PI / segments.length;
+  let angle = -Math.PI / 2;
 
-function drawWheel() {
-  ctx.clearRect(0, 0, width, height);
-  for(let i=0; i<segments.length; i++){
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.arc(center, center, center, angle + i*arc, angle + (i+1)*arc);
-    ctx.fillStyle = segments[i].color;
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-}
-
-function spinWheel() {
-  const randomSlice = Math.floor(Math.random() * segments.length);
-  const targetAngle = randomSlice * arc + arc / 2;
-
-  const spins = 6;
-  const targetRotation = spins * 2 * Math.PI + targetAngle;
-
-  const duration = 7000;
-  const start = performance.now();
-
-  function animate(time) {
-    let elapsed = time - start;
-    let progress = Math.min(elapsed / duration, 1);
-    let eased = 1 - Math.pow(1 - progress, 3);
-    angle = (-Math.PI/2 + targetRotation * eased) % (2 * Math.PI);
-    drawWheel();
-
-    if(progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      showResult(segments[randomSlice]);
+  function drawWheel() {
+    ctx.clearRect(0, 0, width, height);
+    for (let i = 0; i < segments.length; i++) {
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, center, angle + i * arc, angle + (i + 1) * arc);
+      ctx.fillStyle = segments[i].color;
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.save();
+      ctx.fillStyle = "#000";
+      ctx.translate(center, center);
+      ctx.rotate(angle + (i + 0.5) * arc);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = "bold 16px Arial";
+      ctx.fillText(segments[i].text, 0, -center + 20);
+      ctx.restore();
     }
   }
 
-  requestAnimationFrame(animate);
-}
+  function spinWheel() {
+    const randomSlice = Math.floor(Math.random() * segments.length);
+    const targetAngle = randomSlice * arc + arc / 2;
 
-function showResult(segment){
-  document.getElementById('result').innerText = segment.message;
-  if(segment.confetti) launchConfetti();
-}
+    const spins = 6;
+    const targetRotation = spins * 2 * Math.PI + targetAngle;
 
-function launchConfetti(){
-  const confettiCount = 100;
-  const confettiElements = [];
-  const colors = ['#efd729','#ccc','#fff','#888'];
-  const container = document.querySelector('.wheel-container');
-  const centerX = container.offsetLeft + container.offsetWidth/2;
-  const centerY = container.offsetTop + container.offsetHeight/2;
+    const duration = 7000;
+    const start = performance.now();
 
-  for(let i=0; i<confettiCount; i++){
-    const confetti = document.createElement('div');
-    confetti.style.position = 'absolute';
-    confetti.style.width = confetti.style.height = Math.random()*8 + 4 + 'px';
-    confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-    confetti.style.left = centerX + 'px';
-    confetti.style.top = centerY + 'px';
-    confetti.style.opacity = Math.random() * 0.9 + 0.1;
-    confetti.style.borderRadius = '50%';
-    confetti.style.transform = `rotate(${Math.random()*360}deg)`;
-    document.body.appendChild(confetti);
+    function animate(time) {
+      let elapsed = time - start;
+      let progress = Math.min(elapsed / duration, 1);
+      let eased = 1 - Math.pow(1 - progress, 3);
+      angle = (-Math.PI / 2 + targetRotation * eased) % (2 * Math.PI);
+      drawWheel();
 
-    const angle = Math.random() * 2 * Math.PI;
-    const speed = Math.random()*6 + 4;
-    confettiElements.push({
-      el: confetti,
-      x: centerX,
-      y: centerY,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      rotation: Math.random()*360,
-      rotationSpeed: (Math.random()-0.5)*10,
-      gravity: 0.2 + Math.random()*0.1
-    });
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        showResult(segments[randomSlice]);
+      }
+    }
+
+    requestAnimationFrame(animate);
   }
 
-  const duration = 3000;
-  const start = performance.now();
+  function showResult(segment) {
+    document.getElementById('result').innerText = segment.message;
+    if (segment.confetti) launchConfetti();
+  }
 
-  function animate(time){
-    let elapsed = time - start;
-    if(elapsed > duration){
-      confettiElements.forEach(c => c.el.remove());
+  function launchConfetti() {
+    const confettiCount = 100;
+    const confettiElements = [];
+    const colors = ['#efd729', '#ccc', '#fff', '#888'];
+    const container = document.querySelector('.wheel-container');
+    const centerX = container.offsetLeft + container.offsetWidth / 2;
+    const centerY = container.offsetTop + container.offsetHeight / 2;
+
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.style.position = 'absolute';
+      confetti.style.width = confetti.style.height = Math.random() * 8 + 4 + 'px';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.left = centerX + 'px';
+      confetti.style.top = centerY + 'px';
+      confetti.style.opacity = Math.random() * 0.9 + 0.1;
+      confetti.style.borderRadius = '50%';
+      confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(confetti);
+
+      const angle = Math.random() * 2 * Math.PI;
+      const speed = Math.random() * 6 + 4;
+      confettiElements.push({
+        el: confetti,
+        x: centerX,
+        y: centerY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        gravity: 0.2 + Math.random() * 0.1
+      });
+    }
+
+    const duration = 3000;
+    const start = performance.now();
+
+    function animate(time) {
+      let elapsed = time - start;
+      if (elapsed > duration) {
+        confettiElements.forEach(c => c.el.remove());
+        return;
+      }
+
+      confettiElements.forEach(c => {
+        c.vy += c.gravity;
+        c.x += c.vx;
+        c.y += c.vy;
+        c.rotation += c.rotationSpeed;
+        c.el.style.top = c.y + 'px';
+        c.el.style.left = c.x + 'px';
+        c.el.style.transform = `rotate(${c.rotation}deg)`;
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  drawWheel();
+  document.getElementById('spin').addEventListener('click', spinWheel);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = canvas.offsetWidth;
+    height = canvas.height = canvas.offsetWidth;
+    drawWheel();
+  });
+</script>
