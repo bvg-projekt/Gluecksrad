@@ -178,7 +178,6 @@
   <a href="https://www.youtube.com/channel/UCdaxl-IR391oXfOadWm-a1A" target="_blank">YouTube</a>
 </div>
 
-<!-- Popup -->
 <div id="result-popup" class="popup">
   <div class="popup-content">
     <p id="popup-message"></p>
@@ -194,75 +193,58 @@ let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetWidth;
 const center = width / 2;
 
+// Segmente: Gelb, Hellgrau, Hellgrau, Weiß, Weiß, Dunkelgrau
 const segments = [
-  {color:'#efd729', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true}, // Hauptgewinn
-  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
-  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true}, // Kleiner Gewinn
-  {color:'#888', message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false}, // Niete
-  {color:'#ccc', message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true}, // Mittlerer Gewinn
-  {color:'#fff', message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true} // Kleiner Gewinn
+  { color:'#efd729', text:"Hauptgewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Das Fundament für nachhaltige Projekte entsteht durch Kreislaufwirtschaft und Wiederverwendung.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#ccc', text:"Mittlerer Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen!\n„Wie unsere Infrastruktur verbindet auch dieser Gewinn Natur und Zukunft.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#fff', text:"Kleiner Gewinn", message:"Herzlichen Glückwunsch, Sie haben gewonnen.\n„Aus kleinen Samen wächst neuer Lebensraum – nachhaltig und lebendig.“", confetti:true },
+  { color:'#888', text:"Niete", message:"Vielen Dank für Ihre Teilnahme. Sie haben leider nicht gewonnen.", confetti:false }
 ];
 
 const arc = 2 * Math.PI / segments.length;
-let startAngle = -Math.PI/2; // Zeiger oben
+let startAngle = -Math.PI / 2; // Pfeil oben
 
-function drawWheel(){
+function drawWheel(rotation = 0){
   ctx.clearRect(0,0,width,height);
   for(let i=0;i<segments.length;i++){
     ctx.beginPath();
     ctx.moveTo(center,center);
-    ctx.arc(center,center,center, startAngle + i*arc, startAngle + (i+1)*arc);
+    ctx.arc(center,center,center,startAngle + i*arc + rotation, startAngle + (i+1)*arc + rotation);
     ctx.fillStyle = segments[i].color;
     ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle="#ffffff";
+    ctx.lineWidth=2;
     ctx.stroke();
   }
 }
 
-// Animation
+// Spin-Funktion
 function spinWheel(){
   const randomIndex = Math.floor(Math.random()*segments.length);
+  const spins = 6;
+  const targetRotation = spins*2*Math.PI + (2*Math.PI - (randomIndex*arc + arc/2));
 
-  // Winkel zum Mittelpunkt des gewählten Segments
-  const targetAngle = startAngle + randomIndex*arc + arc/2;
-
-  const spins = 6; 
-  const targetRotation = spins*2*Math.PI + targetAngle;
-  const duration = 5000;
+  const duration = 7000;
   const start = performance.now();
 
   function animate(time){
-    let elapsed = time - start;
-    let progress = Math.min(elapsed/duration,1);
-    let eased = 1 - Math.pow(1-progress,3);
-    let currentAngle = startAngle + targetRotation*eased;
-
-    // Rad zeichnen
-    ctx.clearRect(0,0,width,height);
-    for(let i=0;i<segments.length;i++){
-      ctx.beginPath();
-      ctx.moveTo(center,center);
-      ctx.arc(center,center,center, currentAngle + i*arc, currentAngle + (i+1)*arc);
-      ctx.fillStyle = segments[i].color;
-      ctx.fill();
-      ctx.strokeStyle="#fff";
-      ctx.lineWidth=2;
-      ctx.stroke();
-    }
-
+    const elapsed = time - start;
+    const progress = Math.min(elapsed/duration,1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const rotation = targetRotation * eased;
+    drawWheel(rotation);
     if(progress < 1){
       requestAnimationFrame(animate);
     } else {
-      // Startwinkel für nächste Drehung setzen
-      startAngle = (currentAngle) % (2*Math.PI);
       showResult(segments[randomIndex]);
     }
   }
   requestAnimationFrame(animate);
 }
 
-// Popup
+// Popup & Buttons
 const popup = document.getElementById('result-popup');
 const popupMessage = document.getElementById('popup-message');
 const closeBtn = document.querySelector('.popup .close-btn');
@@ -275,11 +257,7 @@ function showResult(segment){
   if(segment.confetti) launchConfetti();
 }
 
-// Buttons
-closeBtn.onclick = () => {
-  popup.classList.remove('show');
-  setTimeout(()=>popup.style.display='none',300);
-}
+closeBtn.onclick = () => { popup.classList.remove('show'); setTimeout(()=>popup.style.display='none',300); }
 confettiBtn.onclick = () => launchConfetti();
 
 // Konfetti
@@ -320,7 +298,7 @@ function launchConfetti(){
   const duration=3000;
   const start = performance.now();
   function animate(time){
-    let elapsed = time - start;
+    let elapsed = time-start;
     if(elapsed>duration){ confettiElements.forEach(c=>c.el.remove()); return; }
     confettiElements.forEach(c=>{
       c.vy+=c.gravity;
