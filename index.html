@@ -206,7 +206,7 @@ const segments = [
 
 
 const arc = 2 * Math.PI / segments.length;
-let angle = -Math.PI/2;
+let angle = -Math.PI/2 + (arc / 2);
 
 function drawWheel(){
   ctx.clearRect(0,0,width,height);
